@@ -1,6 +1,6 @@
 {
   "name": "runharness",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A complete, observable Agent Harness for learning from real development work",
   "type": "module",
   "license": "MIT",
