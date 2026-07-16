@@ -212,6 +212,15 @@ describe("project acceptance config", () => {
 });
 
 describe("cancellable processes", () => {
+  it("settles from the exit code when a command closes stdin immediately", async () => {
+    const { runProcess } = await import("../runtime/process.js");
+    const result = await runProcess(process.execPath, ["-e", "process.exit(0)"], {
+      cwd: process.cwd(),
+      input: "input that the command will not read".repeat(100_000),
+    });
+    expect(result.code).toBe(0);
+  });
+
   it("terminates the process tree when its AbortSignal is cancelled", async () => {
     const controller = new AbortController();
     const task = import("../runtime/process.js").then(({ runProcess }) => runProcess(process.execPath, ["-e", "setInterval(()=>{},1000)"], { cwd: process.cwd(), signal: controller.signal }));

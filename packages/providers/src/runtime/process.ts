@@ -25,6 +25,12 @@ export function runProcess(command: string, args: string[], options: { cwd: stri
     options.signal?.addEventListener("abort", onAbort, { once: true });
     const timer = setTimeout(terminate, options.timeoutMs ?? 300_000);
     child.on("error", (error) => { if (!settled) { settled = true; clearTimeout(timer); options.signal?.removeEventListener("abort", onAbort); reject(error); } });
+    child.stdin.on("error", (error: NodeJS.ErrnoException) => {
+      // A short-lived command may close its read side before Node finishes
+      // closing stdin. Its exit code remains the authoritative result.
+      if (error.code === "EPIPE") return;
+      if (!settled) { settled = true; clearTimeout(timer); options.signal?.removeEventListener("abort", onAbort); terminate(); reject(error); }
+    });
     child.on("close", (code) => {
       if (settled) return;
       settled = true; clearTimeout(timer); options.signal?.removeEventListener("abort", onAbort);
@@ -35,7 +41,8 @@ export function runProcess(command: string, args: string[], options: { cwd: stri
       if (aborted) reject(abortError());
       else resolve({ stdout, stderr, code, durationMs: Date.now() - started });
     });
-    child.stdin.end(options.input ?? "");
+    if (options.input === undefined) child.stdin.end();
+    else child.stdin.end(options.input);
   });
 }
 
