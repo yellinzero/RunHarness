@@ -1,0 +1,8 @@
+{
+  "name": "@runharness/development",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": { "types": "./src/index.ts", "default": "./dist/index.js" } },
+  "dependencies": { "@runharness/core": "workspace:*", "@runharness/providers": "workspace:*", "@runharness/shared": "workspace:*" },
+  "scripts": { "build": "tsc -p tsconfig.json", "typecheck": "tsc -p tsconfig.json --noEmit" }
+}

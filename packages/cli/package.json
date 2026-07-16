@@ -1,0 +1,63 @@
+{
+  "name": "runharness",
+  "version": "0.1.0",
+  "description": "A complete, observable Agent Harness for learning from real development work",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yellinzero/RunHarness.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/yellinzero/RunHarness#readme",
+  "bugs": "https://github.com/yellinzero/RunHarness/issues",
+  "keywords": [
+    "agent",
+    "agent-harness",
+    "cli",
+    "coding-agent",
+    "observability",
+    "tui"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "runharness": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.3.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "fastify": "^5.10.0",
+    "ink": "^6.8.0",
+    "react": "^19.2.7",
+    "string-width": "^8.2.2"
+  },
+  "scripts": {
+    "build": "tsup && node scripts/copy-dashboard.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@runharness/dashboard": "workspace:*",
+    "@runharness/development": "workspace:*",
+    "@runharness/providers": "workspace:*",
+    "@runharness/server": "workspace:*",
+    "@runharness/shared": "workspace:*",
+    "@types/react": "^19.2.17",
+    "tsup": "^8.5.1"
+  }
+}

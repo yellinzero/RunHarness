@@ -1,0 +1,70 @@
+name: prerelease
+
+on:
+  workflow_dispatch:
+    inputs:
+      next_version:
+        description: Stable version to preview, for example 0.2.0
+        required: false
+        type: string
+
+concurrency:
+  group: prerelease-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  beta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - name: Set beta version
+        run: |
+          node <<'EOF'
+          const fs = require('node:fs');
+          const file = 'packages/cli/package.json';
+          const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const [major, minor, patch] = pkg.version.split('-')[0].split('.').map(Number);
+          const requested = process.env.NEXT_VERSION.trim();
+          const base = requested || `${major}.${minor}.${patch + 1}`;
+          if (!/^\d+\.\d+\.\d+$/.test(base)) {
+            throw new Error(`Invalid next_version '${base}'; expected a stable semver such as 0.2.0`);
+          }
+          const next = base.split('.').map(Number);
+          const current = [major, minor, patch];
+          const isGreater = next.some((part, index) => part > current[index] && next.slice(0, index).every((value, prefix) => value === current[prefix]));
+          if (!isGreater) {
+            throw new Error(`next_version '${base}' must be greater than the current version ${major}.${minor}.${patch}`);
+          }
+          const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
+          pkg.version = `${base}-beta.${timestamp}`;
+          fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
+          console.log(`Publishing ${pkg.name}@${pkg.version}`);
+          EOF
+        env:
+          NEXT_VERSION: ${{ inputs.next_version }}
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm package:check
+      - name: Publish beta
+        run: pnpm --filter runharness publish --tag beta --access public --no-git-checks
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

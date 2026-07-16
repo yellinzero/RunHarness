@@ -1,0 +1,34 @@
+{
+  "name": "runharness-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.13.1",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "pnpm -r build",
+    "changeset": "changeset",
+    "dogfood:activate": "node scripts/dogfood.mjs activate",
+    "dogfood:prepare": "node scripts/dogfood.mjs prepare",
+    "dev": "pnpm --parallel --filter @runharness/server --filter @runharness/dashboard dev",
+    "package:check": "node packages/cli/scripts/verify-package.mjs",
+    "release": "pnpm package:check && changeset publish",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "runharness": "tsx packages/cli/src/index.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@types/node": "^24.0.15",
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.29.7",
+    "eslint": "^9.31.0",
+    "globals": "^16.3.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.38.0",
+    "vitest": "^3.2.4"
+  }
+}

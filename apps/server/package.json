@@ -1,0 +1,16 @@
+{
+  "name": "@runharness/server",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": { "types": "./src/index.ts", "default": "./dist/index.js" } },
+  "dependencies": {
+    "@runharness/core": "workspace:*",
+    "@runharness/development": "workspace:*",
+    "@runharness/providers": "workspace:*",
+    "@runharness/shared": "workspace:*",
+    "@fastify/cors": "^11.0.1",
+    "fastify": "^5.4.0"
+  },
+  "scripts": { "dev": "tsx watch src/main.ts", "build": "tsc -p tsconfig.json", "typecheck": "tsc -p tsconfig.json --noEmit" },
+  "devDependencies": { "tsx": "^4.20.3" }
+}
