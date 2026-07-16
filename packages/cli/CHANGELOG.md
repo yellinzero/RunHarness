@@ -1,5 +1,11 @@
 # runharness
 
+## 0.2.1
+
+### Patch Changes
+
+- Keep internal monorepo workspaces private so releases publish only the RunHarness CLI.
+
 ## 0.2.0
 
 ### Minor Changes
